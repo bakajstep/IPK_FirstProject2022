@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # IPK_FirstProject
 TCP Server
 =======
@@ -99,4 +98,3 @@ Zadání nepostihuje ani nemůže postihovat veškeré možnosti, které Vás na
 Protokol HTTP RFC7231 - https://tools.ietf.org/html/rfc7231
 HTTP pro vývojáře: https://developer.mozilla.org/en-US/docs/Web/HTTP
 Výpočet CPU Load: https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
->>>>>>> 128b291a82653d78f08c1a62959f700f831d7b87
