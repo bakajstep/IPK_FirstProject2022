@@ -48,7 +48,8 @@ int main(int argc, char *argv[] ) {
 
     sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sockfd == -1) {
-        exit(0);
+        fprintf(stderr, "Socket creation failed!\n");
+        exit(EXIT_FAILURE);
     }
     bzero(&servaddr, sizeof(servaddr));
 
@@ -62,19 +63,22 @@ int main(int argc, char *argv[] ) {
 
     // Nastaveni socketu
     if ((bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0) {
-        exit(0);
+        fprintf(stderr, "Socket bind failed!\n");
+        exit(EXIT_FAILURE);
     }
 
     // naslouchani
     if ((listen(sockfd, 5)) != 0) {
-        exit(0);
+        fprintf(stderr, "Listen failed!\n");
+        exit(EXIT_FAILURE);
     }
     len = sizeof(cli);
 
     while (1){
         connfd = accept(sockfd, (struct sockaddr*)&cli, &len);
         if (connfd < 0) {
-            exit(0);
+            fprintf(stderr, "Server accept failed!\n");
+            exit(EXIT_FAILURE);
         }
         for(;;){
             int res = 0;
@@ -86,16 +90,30 @@ int main(int argc, char *argv[] ) {
                 bzero(buff, MAX_RESPONSE);
                 char cpuname[MAX_CPUINFO];
                 char* command = "lscpu | grep 'Model name' | cut -f 2 -d \":\" | awk '{$1=$1}1'";
-                getTerminalOutput(command,cpuname);
+                if(getTerminalOutput(command,cpuname) == -1){
+                    fprintf(stderr, "Eror in cpu-name command!\n");
+                    close(connfd);
+                    exit(EXIT_FAILURE);
+                }
                 sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%s",cpuname);
             } else if (strstr(buff,"GET /hostname ")) {
                 bzero(buff, MAX_RESPONSE);
                 char hostname[MAX_HOSTNAME];
                 char* command = "hostname";
-                getTerminalOutput(command,hostname);
+                if(getTerminalOutput(command,hostname) == -1){
+                    fprintf(stderr, "Eror in hostname command!\n");
+                    close(connfd);
+                    exit(EXIT_FAILURE);
+                }
                 sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%s",hostname);
             } else if (strstr(buff,"GET /load ")) {
-                sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%d%c",cpuUsage(),'%');
+                int load = cpuUsage();
+                if(load == -1){
+                    fprintf(stderr, "Eror in hostname command!\n");
+                    close(connfd);
+                    exit(EXIT_FAILURE);
+                }
+                sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%d%c",load,'%');
             } else {
                 sprintf(buff,"HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain;\r\n\r\n%s","400 Bad request");
             }
