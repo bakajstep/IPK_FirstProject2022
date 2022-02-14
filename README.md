@@ -43,7 +43,7 @@ GET http://servername:12345/load
 
 Potřebné informace pro odpověď lze v systému získat pomocí některých příkazů systému (uname, lscpu) a/nebo ze souborů v adresáři /proc. 
 
-###IMPLEMENTACE
+### IMPLEMENTACE
 
 Implementace serveru bude v jazyce C/C++. Pro implementaci serveru je nutné využít knihovnu soketů. Není přípustné využívat knihovny pro zpracování HTTP a podobně - cílem je lightweight server, který má minimum závislostí.
 
