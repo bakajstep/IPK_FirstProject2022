@@ -16,14 +16,12 @@ int cpuUsage(){
     return 15;
 }
 
-
-//vracim 1 pro uspech a -1 pro neuspech
-int hostName(char* hostname){
+int getTerminalOutput(char* command, char* buff){
 
     FILE *p;
     char ch;
 
-    p = popen("hostname","r"); //precteni hostnamu
+    p = popen(command,"r"); //ziskani streamu s odpovedi
     if( p == NULL)
     {
         return -1;
@@ -33,42 +31,17 @@ int hostName(char* hostname){
         if(ch == '\n'){
             break;
         } else{
-            hostname[i++] = ch;
+            buff[i++] = ch;
         }
     }
-    hostname[i] = '\0';
+    buff[i] = '\0';
     return 1;
 }
-
-
-//vracim 1 pro uspech a -1 pro neuspech
-int cpuName(char* cpuname){
-
-    FILE *p;
-    char ch;
-
-    p = popen("lscpu | grep 'Model name' | cut -f 2 -d \":\" | awk '{$1=$1}1'","r"); //precteni model namu cpu
-    if( p == NULL)
-    {
-        return -1;
-    }
-    int i = 0;
-    while( (ch=fgetc(p)) != EOF){
-        if(ch == '\n'){
-            break;
-        } else{
-            cpuname[i++] = ch;
-        }
-    }
-    cpuname[i] = '\0';
-    return 1;
-}
-
 
 int main(int argc, char *argv[] ) {
 
     int port = atoi(argv[1]);
-    int sockfd, connfd, se;
+    int sockfd, connfd;
     unsigned int len;
     struct sockaddr_in servaddr, cli;
     char buff[MAX_RESPONSE];
@@ -112,12 +85,14 @@ int main(int argc, char *argv[] ) {
             if (strstr(buff,"GET /cpu-name ")) {
                 bzero(buff, MAX_RESPONSE);
                 char cpuname[MAX_CPUINFO];
-                cpuName(cpuname);
+                char* command = "lscpu | grep 'Model name' | cut -f 2 -d \":\" | awk '{$1=$1}1'";
+                getTerminalOutput(command,cpuname);
                 sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%s",cpuname);
             } else if (strstr(buff,"GET /hostname ")) {
                 bzero(buff, MAX_RESPONSE);
                 char hostname[MAX_HOSTNAME];
-                hostName(hostname);
+                char* command = "hostname";
+                getTerminalOutput(command,hostname);
                 sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%s",hostname);
             } else if (strstr(buff,"GET /load ")) {
                 sprintf(buff,"HTTP/1.1 200 OK\r\nContent-Type: text/plain;\r\n\r\n%d%c",cpuUsage(),'%');
