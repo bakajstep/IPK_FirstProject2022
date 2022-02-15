@@ -10,10 +10,57 @@
 #define MAX_CPUINFO 256
 #define MAX_RESPONSE 1024
 
-int cpuUsage(){
+unsigned long long getTotalCpuTime( unsigned long long* idl) {
+    FILE* file = fopen("/proc/stat", "r");
+    if (file == NULL) {
+        fprintf(stderr, "Could not open stat file!\n");
+        return -1;
+    }
 
-    
-    return 15;
+    char buffer[1024];
+    unsigned long long user = 0, nice = 0, system = 0, idle = 0;
+        unsigned long long iowait = 0, irq = 0, softirq = 0, steal = 0, guest = 0, guestnice = 0;
+
+    char* ret = fgets(buffer, sizeof(buffer) - 1, file);
+    if (ret == NULL) {
+        fprintf(stderr, "Could not open stat file!\n");
+        fclose(file);
+        return -1;
+    }
+    fclose(file);
+
+    sscanf(buffer,
+           "cpu  %16llu %16llu %16llu %16llu %16llu %16llu %16llu %16llu %16llu %16llu",
+           &user, &nice, &system, &idle, &iowait, &irq, &softirq, &steal, &guest, &guestnice);
+
+
+    *idl = idle + iowait;
+    return user + nice + system + idle + iowait + irq + softirq + steal;
+}
+
+int cpuUsage(){
+    unsigned long long totald, total, prevTotal ;
+    unsigned long long idle, prevIdle, idled;
+    double load;
+
+    //prvni cteni
+    prevTotal = getTotalCpuTime(&prevIdle);
+    if(prevTotal == -1){
+        return -1;
+    }
+    sleep(1);
+
+    //druhy cteni
+    total = getTotalCpuTime(&idle);
+    if(total == -1){
+        return -1;
+    }
+    totald = total - prevTotal;
+    idled = idle - prevIdle;
+
+    load = ((double)(totald-idled)/(double)totald)*100;
+
+    return (int)load;
 }
 
 int getTerminalOutput(char* command, char* buff){
