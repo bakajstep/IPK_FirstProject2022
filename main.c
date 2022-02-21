@@ -14,7 +14,7 @@ unsigned long long getTotalCpuTime( unsigned long long* idl) {
     FILE* file = fopen("/proc/stat", "r");
     if (file == NULL) {
         fprintf(stderr, "Could not open stat file!\n");
-        return -1;
+        return 0;
     }
 
     char buffer[1024];
@@ -45,14 +45,14 @@ int cpuUsage(){
 
     //prvni cteni
     prevTotal = getTotalCpuTime(&prevIdle);
-    if(prevTotal == -1){
+    if(prevTotal == 0){
         return -1;
     }
     sleep(1);
 
     //druhy cteni
     total = getTotalCpuTime(&idle);
-    if(total == -1){
+    if(total == 0){
         return -1;
     }
     totald = total - prevTotal;
@@ -87,6 +87,11 @@ int getTerminalOutput(char* command, char* buff){
 
 int main(int argc, char *argv[] ) {
 
+    if (argc != 2){
+        fprintf(stderr, "Wrong number of parameters!\n");
+        exit(EXIT_FAILURE);
+    }
+
     int port = atoi(argv[1]);
     int sockfd, connfd;
     unsigned int len;
@@ -105,8 +110,7 @@ int main(int argc, char *argv[] ) {
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(port);
 
-    setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&(int){1}, sizeof(int));
-    setsockopt(sockfd,SOL_SOCKET,SO_REUSEPORT,&(int){1}, sizeof(int));
+    setsockopt(sockfd,SOL_SOCKET,SO_REUSEPORT | SO_REUSEADDR,&(int){1}, sizeof(int));
 
     // Nastaveni socketu
     if ((bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0) {
