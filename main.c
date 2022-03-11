@@ -87,12 +87,22 @@ int getTerminalOutput(char* command, char* buff){
 
 int main(int argc, char *argv[] ) {
 
+    //kontrola poctu paramatru
     if (argc != 2){
         fprintf(stderr, "Wrong number of parameters!\n");
         exit(EXIT_FAILURE);
     }
 
     int port = atoi(argv[1]);
+
+    //kontrola rozsahu portu
+    if(port < 1024 || port > 65535){
+        fprintf(stderr, "Wrong port!\n");
+        exit(EXIT_FAILURE);
+    }
+
+
+
     int sockfd, connfd;
     unsigned int len;
     struct sockaddr_in servaddr, cli;

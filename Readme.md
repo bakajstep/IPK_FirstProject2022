@@ -1,5 +1,7 @@
 # IPK - Server
 
+Autor: Štěpán Bakaj - xbakaj00
+
 Leighweight server, který slouží pro získání základních informací systémových informací ze zadání.
 
 Server je určený pro Linux Ubuntu 20.04 LTS  (https://ubuntu.com/).
@@ -77,4 +79,4 @@ Odpověď:
 
 ## Využití
 
-Využití pro teneto projekt vidím pro správce hw, který má na starost spousty počítačů, aby mohl kontrolovat a informovat se o počítačích z jednoho místa. Samozřejmě by se aplikace musela rozšířit o další funkcionalitu. Nebo by se to dalo využít pro statistiky, kde nějaký skript v pravidelném intervalu se dotáže serveru(ů) a zapíše do souboru.
+Využití pro tento projekt vidím pro správce hw, který má na starost spousty počítačů, aby mohl kontrolovat a informovat se o počítačích z jednoho místa. Samozřejmě by se aplikace musela rozšířit o další funkcionalitu. Nebo by se to dalo využít pro statistiky, kde nějaký skript v pravidelném intervalu se dotáže serveru(ů) a zapíše do souboru.
